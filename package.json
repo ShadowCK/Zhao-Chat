@@ -1,0 +1,16 @@
+{
+  "name": "zhao-chat",
+  "version": "1.0.0",
+  "description": "Web chat app that allows people to connect",
+  "main": "./src/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Zhao Jin",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "eslint": "^8.51.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.28.1"
+  }
+}
