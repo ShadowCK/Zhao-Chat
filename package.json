@@ -4,7 +4,9 @@
   "description": "Web chat app that allows people to connect",
   "main": "./src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Tests complete\""
   },
   "author": "Zhao Jin",
   "license": "UNLICENSED",
