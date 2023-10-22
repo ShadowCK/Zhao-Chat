@@ -1,5 +1,3 @@
-console.log("hello world!");
-
 const handleResponse = async (response, method) => {
   const content = document.querySelector("#content");
 
@@ -58,7 +56,7 @@ const sendRequest = (url, method, body) => {
 };
 
 const init = () => {
-  console.log("Hello!");
+  console.log("Hello World!");
   // TODO
 };
 
