@@ -39,7 +39,10 @@ const handleResponse = async (response, method) => {
   if (contentType && contentType.includes("application/json")) {
     const obj = await response.json();
     console.log(obj);
-  } else {
+  }
+  // Normally, this wouldn't happen because we are using JSON only.
+  // But we still want to handle other types if unexpected behavior occurs.
+  else {
     console.error("Unhandled content type:", contentType);
   }
 };
@@ -48,6 +51,7 @@ const handleResponse = async (response, method) => {
 const sendRequest = (url, method, body) => {
   fetch(url, {
     method,
+    // We only use json in this application
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
