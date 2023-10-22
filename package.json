@@ -5,16 +5,26 @@
   "main": "./src/server.js",
   "scripts": {
     "start": "node ./src/server.js",
+    "start-dev": "npm run test & concurrently \"npm run watchBundle\" \"npm run nodemon\"",
     "pretest": "eslint ./src --fix",
     "test": "echo \"Tests complete\"",
-    "nodemon": "nodemon -e js,html,css --watch ./src --watch ./hosted ./src/server.js"
+    "nodemon": "nodemon -e js,html,css --watch ./src --watch ./hosted ./src/server.js",
+    "buildBundle": "webpack",
+    "watchBundle": "webpack watch",
+    "heroku-postbuild": "webpack --mode production",
+    "debug": "node --inspect ./src/server.js"
   },
   "author": "Zhao Jin",
   "license": "UNLICENSED",
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "eslint": "^8.51.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-import": "^2.28.1",
     "nodemon": "^3.0.1"
+  },
+  "dependencies": {
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   }
 }
