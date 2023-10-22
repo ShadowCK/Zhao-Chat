@@ -1,14 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Our simple HTTP server</title>
+    <title>Zhao Drift</title>
+    <!-- Bulma CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
+    <!-- Our own style sheet -->
     <link rel="stylesheet" type="text/css" href="/style.css" />
-    <script src="/bundle.js"></script>
+    <!-- Bundled client script -->
+    <script src="/bundle.js" defer></script>
   </head>
   <body>
-    <section id="top">
-      <h3>Zhao Chat</h3>
+    <section class="hero is-primary">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">Zhao Drift</h1>
+          <h2 class="subtitle">Your space to send and receive messages in a bottle</h2>
+        </div>
+      </div>
     </section>
-    <section id="content"></section>
+
+    <section class="section">
+      <div class="container">
+        <!-- Message Submission Section -->
+        <div class="columns">
+          <div class="column is-6 is-offset-3">
+            <div class="field">
+              <label class="label">Leave a message:</label>
+              <div class="control">
+                <textarea class="textarea" id="messageInput" placeholder="Type your message here..."></textarea>
+              </div>
+            </div>
+            <div class="field">
+              <div class="control">
+                <button class="button is-link" id="sendMessage">Send Message</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drift Bottle Interaction Section -->
+        <div class="columns">
+          <div class="column is-6 is-offset-3">
+            <button class="button is-primary" id="fetchBottle">Drift Bottle</button>
+            <div id="bottleDisplay" class="box" style="display: none">
+              <!-- Bottle Content will be displayed here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </body>
 </html>

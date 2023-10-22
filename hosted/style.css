@@ -1,21 +1,28 @@
-html, body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #f4f4f9;
 }
 
-#top {
-  text-align: center;
-  margin: 0 auto;
+.hero.is-primary {
+  background-color: #3498db;
 }
 
-#top h1 {
-  font-size: 2em;
+.button.is-primary {
+  background-color: #3498db;
 }
 
-#content {
-  margin-top: 100px;
-  font-size: 2em;
-  text-align: center;
+.button.is-link {
+  background-color: #2ecc71;
+}
+
+#bottleDisplay {
+  background-color: #e8e8e8;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+textarea {
+  min-height: 150px;
 }
