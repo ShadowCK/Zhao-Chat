@@ -1,43 +1,50 @@
-const handleResponse = async (response, method) => {
-  const content = document.querySelector("#content");
+// Function to display messages to the user using a popup (alert)
+const showMessage = (message) => {
+  alert(message);
+};
 
+// Function to handle the response from the server
+const handleResponse = async (response, method) => {
+  // Based on the response status, show relevant message to the user
   switch (response.status) {
     case 200:
-      content.innerHTML = `<b>Success</b>`;
+      showMessage("Success");
       break;
     case 201:
-      content.innerHTML = `<b>Created</b>`;
+      showMessage("Created");
       break;
     case 204:
-      content.innerHTML = `<b>Updated(No Content)</b>`;
+      showMessage("Updated(No Content)");
       break;
     case 400:
-      content.innerHTML = `<b>Bad Request</b>`;
+      showMessage("Bad Request");
       break;
-    case 500: // internal server error
-      content.innerHTML = `<b>Internal Server Error</b>`;
+    case 500:
+      showMessage("Internal Server Error");
       break;
     case 404:
     default:
-      content.innerHTML = `<b>Not Found</b>`;
+      showMessage("Not Found");
       break;
   }
 
-  const contentType = response.headers.get("content-type");
-  // No content is needed to be parsed. Let's bail out.
-  if (method == "HEAD" || response.status === 204) {
+  // For HEAD request or a status of 204, no content is expected.
+  if (method === "HEAD" || response.status === 204) {
     return;
   }
-  // Parse content
+
+  const contentType = response.headers.get("content-type");
+
+  // If the content type is JSON, parse and log it to the console
   if (contentType && contentType.includes("application/json")) {
     const obj = await response.json();
     console.log(obj);
-    content.innerHTML += `<p>${JSON.stringify(obj)}</p>`;
   } else {
     console.error("Unhandled content type:", contentType);
   }
 };
 
+// Function to send a request to the server
 const sendRequest = (url, method, body) => {
   fetch(url, {
     method,
@@ -45,19 +52,39 @@ const sendRequest = (url, method, body) => {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body,
+    // Stringify the body if it exists, else it will be treated as undefined (no body)
+    body: body ? JSON.stringify(body) : undefined,
   })
     .then((response) => handleResponse(response, method))
     .catch((error) => {
       console.error("Error:", error);
-      const content = document.querySelector("#content");
-      content.innerHTML = `<b>Error: ${error.message}</b>`;
+      showMessage(`Error: ${error.message}`);
     });
 };
 
+// Initialize the event listeners on page load
 const init = () => {
-  console.log("Hello World!");
-  // TODO
+  console.log("Zhao Drift initialized!");
+
+  const fetchBottleBtn = document.querySelector("#fetchBottle");
+  const sendMessageBtn = document.querySelector("#sendMessage");
+  const messageInput = document.querySelector("#messageInput");
+
+  // Fetch a bottle when the relevant button is clicked
+  fetchBottleBtn.addEventListener("click", () => {
+    sendRequest("/fetchBottle", "GET");
+  });
+
+  // Send a message when the relevant button is clicked
+  sendMessageBtn.addEventListener("click", () => {
+    const message = messageInput.value.trim();
+    if (message.length >= 5 && message.length <= 1000) {
+      sendRequest("/sendMessage", "POST", { message });
+      messageInput.value = ""; // Clear the input after sending
+    } else {
+      showMessage("Message must be between 5 and 1000 characters long!");
+    }
+  });
 };
 
 window.onload = init;
