@@ -1,4 +1,4 @@
-const popup = require("./popup.js");
+const popup = require('./popup.js');
 
 // Function to display messages to the user using a popup
 const showMessage = (message) => {
@@ -10,41 +10,41 @@ const handleResponse = async (response, method) => {
   // Based on the response status, show relevant message to the user
   switch (response.status) {
     case 200:
-      showMessage("Success");
+      showMessage('Success');
       break;
     case 201:
-      showMessage("Created");
+      showMessage('Created');
       break;
     case 204:
-      showMessage("Updated(No Content)");
+      showMessage('Updated(No Content)');
       break;
     case 400:
-      showMessage("Bad Request");
+      showMessage('Bad Request');
       break;
     case 500:
-      showMessage("Internal Server Error");
+      showMessage('Internal Server Error');
       break;
     case 404:
     default:
-      showMessage("Not Found");
+      showMessage('Not Found');
       break;
   }
 
   // For HEAD request or a status of 204, no content is expected.
-  if (method === "HEAD" || response.status === 204) {
+  if (method === 'HEAD' || response.status === 204) {
     return;
   }
 
-  const contentType = response.headers.get("content-type");
+  const contentType = response.headers.get('content-type');
 
   // If the content type is JSON, parse and log it to the console
-  if (contentType && contentType.includes("application/json")) {
+  if (contentType && contentType.includes('application/json')) {
     const obj = await response.json();
     console.log(obj);
   } else {
     // Normally, this wouldn't happen because we are using JSON only.
     // But we still want to handle other types if unexpected behavior occurs.
-    console.error("Unhandled content type:", contentType);
+    console.error('Unhandled content type:', contentType);
   }
 };
 
@@ -54,15 +54,15 @@ const sendRequest = (url, method, body) => {
     method,
     // We only use json in this application
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
     // Stringify the body if it exists, else it will be treated as undefined (no body)
     body: body ? JSON.stringify(body) : undefined,
   })
     .then((response) => handleResponse(response, method))
     .catch((error) => {
-      console.error("Error:", error);
+      console.error('Error:', error);
       showMessage(`Error: ${error.message}`);
     });
 };
@@ -99,30 +99,30 @@ const mainLoop = (realtimeSinceStartup) => {
 
 // Initialize the event listeners on page load
 const init = () => {
-  console.log("Zhao Drift initialized!");
+  console.log('Zhao Drift initialized!');
 
-  const fetchBottleBtn = document.querySelector("#fetchBottle");
-  const sendMessageBtn = document.querySelector("#sendMessage");
-  const messageInput = document.querySelector("#messageInput");
+  const fetchBottleBtn = document.querySelector('#fetchBottle');
+  const sendMessageBtn = document.querySelector('#sendMessage');
+  const messageInput = document.querySelector('#messageInput');
 
   // Fetch a bottle when the relevant button is clicked
-  fetchBottleBtn.addEventListener("click", () => {
-    sendRequest("/fetchBottle", "GET");
+  fetchBottleBtn.addEventListener('click', () => {
+    sendRequest('/fetchBottle', 'GET');
   });
 
   // Send a message when the relevant button is clicked
-  sendMessageBtn.addEventListener("click", () => {
+  sendMessageBtn.addEventListener('click', () => {
     const message = messageInput.value.trim();
     if (message.length >= 5 && message.length <= 1000) {
-      sendRequest("/sendMessage", "POST", { message });
-      messageInput.value = ""; // Clear the input after sending
+      sendRequest('/sendMessage', 'POST', { message });
+      messageInput.value = ''; // Clear the input after sending
     } else {
-      showMessage("Message must be between 5 and 1000 characters long!");
+      showMessage('Message must be between 5 and 1000 characters long!');
     }
   });
 
   // Setup popup overlay
-  popup.setCurrentOverlay(document.getElementById("popupOverlay"));
+  popup.setCurrentOverlay(document.getElementById('popupOverlay'));
 
   // Start the main loop
   window.requestAnimationFrame(mainLoop);
