@@ -37,9 +37,9 @@ const fetchBottleById = (id, includeArchived = false) => {
 };
 
 // Fetch a random bottle from availableBottles and move to viewedBottles
-const fetchRandomBottle = () => {
+const fetchRandomBottle = (modifyData = true) => {
   const fetchedBottle = _.sample(availableBottles);
-  if (fetchedBottle) {
+  if (fetchedBottle && modifyData) {
     fetchedBottle.views += 1;
     inReviewBottles.push(fetchedBottle);
     availableBottles = _.without(availableBottles, fetchedBottle);

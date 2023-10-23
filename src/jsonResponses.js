@@ -14,11 +14,11 @@ const respondJSONMeta = (request, response, status) => {
 };
 
 // Fetch a bottle by id or, if no id is given, a random bottle and return as JSON
-const fetchBottleCore = (params = {}) => {
+const fetchBottleCore = (request, response, params = {}) => {
   const includeArchived = params['include-archived'] === '' || params['include-archived'] === 'true';
   const fetchedBottle = params.id
     ? data.fetchBottleById(params.id, includeArchived)
-    : data.fetchRandomBottle();
+    : data.fetchRandomBottle(request.method !== 'HEAD');
 
   if (!fetchedBottle) {
     return {
@@ -37,7 +37,7 @@ const fetchBottleCore = (params = {}) => {
 };
 
 const fetchBottle = (request, response, params) => {
-  const result = fetchBottleCore(params);
+  const result = fetchBottleCore(request, response, params);
 
   if (result.status !== 200) {
     respondJSON(request, response, result.status, result.responseJSON);
@@ -48,7 +48,7 @@ const fetchBottle = (request, response, params) => {
 };
 
 const fetchBottleMeta = (request, response, params) => {
-  const result = fetchBottleCore(params);
+  const result = fetchBottleCore(request, response, params);
   respondJSONMeta(request, response, result.status);
 };
 
