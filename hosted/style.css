@@ -98,3 +98,41 @@ body {
 .popup.important.error .text {
   color: white;
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.drift-bottle-section {
+  background-color: #209cee; /* Bulma's primary blue color */
+  padding: 50px 0; /* Increase padding to make the section more prominent */
+  border-top: 5px solid rgba(32, 156, 238, 0.2); /* Lighter blue border at the top */
+  border-bottom: 5px solid rgba(32, 156, 238, 0.2); /* Lighter blue border at the bottom */
+  position: relative; /* To allow positioning of inner elements if needed */
+}
+
+.drift-bottle-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.1)
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 5s infinite linear;
+}
+
+.drift-bottle-section .container {
+  min-height: 30vh; /* Make the river section taller */
+}

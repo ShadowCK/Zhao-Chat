@@ -10,14 +10,24 @@
     <script src="/bundle.js" defer></script>
   </head>
   <body>
-    <div id="popupOverlay" class="popupOverlay"></div>
-
     <section class="hero is-primary">
       <div class="hero-body">
         <div class="container">
           <h1 class="title">Zhao Drift</h1>
           <h2 class="subtitle">Your space to send and receive messages in a bottle</h2>
         </div>
+      </div>
+    </section>
+
+    <!-- Drift Bottle Animation and Popup Overlay Section -->
+    <section class="section drift-bottle-section">
+      <div class="container">
+        <div id="popupOverlay" class="popupOverlay"></div>
+        <div id="bottleDisplay" class="box" style="display: none">
+          <!-- Bottle Content will be displayed here -->
+          <!-- Additional actions like "throw back into the river", "destroy", "close window" can be added here -->
+        </div>
+        <!-- Markup for drift bottle animation can be added here -->
       </div>
     </section>
 
@@ -43,13 +53,10 @@
             </div>
           </div>
 
-          <!-- Drift Bottle Interaction Section -->
+          <!-- Fetch Bottle Section -->
           <div class="column is-6 is-centered-column">
             <div class="has-text-centered">
               <button class="button is-primary" id="fetchBottle">Fetch Bottle</button>
-            </div>
-            <div id="bottleDisplay" class="box" style="display: none">
-              <!-- Bottle Content will be displayed here -->
             </div>
           </div>
         </div>

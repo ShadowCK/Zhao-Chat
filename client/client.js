@@ -5,13 +5,13 @@ const handleResponse = async (response, method) => {
   // Based on the response status, show relevant message to the user
   switch (response.status) {
     case 200:
-      popup.sendMessage(popup.messageType.important, 'Success', 2.5);
+      popup.sendMessage(popup.messageType.important, 'Success', 1.5);
       break;
     case 201:
-      popup.sendMessage(popup.messageType.important, 'Created', 2.5);
+      popup.sendMessage(popup.messageType.important, 'Created', 1.5);
       break;
     case 204:
-      popup.sendMessage(popup.messageType.important, 'Updated(No Content)', 2.5);
+      popup.sendMessage(popup.messageType.important, 'Updated(No Content)', 1.5);
       break;
     case 400:
       popup.sendError('Bad Request', 2.5);
@@ -58,7 +58,7 @@ const sendRequest = (url, method, body) => {
     .then((response) => handleResponse(response, method))
     .catch((error) => {
       console.error('Error:', error);
-      popup.sendError(`Error: ${error.message}`);
+      popup.sendError(`Error: ${error.message}`, 2.5);
     });
 };
 
@@ -112,7 +112,7 @@ const init = () => {
       sendRequest('/sendMessage', 'POST', { message });
       messageInput.value = ''; // Clear the input after sending
     } else {
-      popup.sendError('Message must be between 5 and 1000 characters long!');
+      popup.sendError('Message must be between 5 and 1000 characters long!', 2.5);
     }
   });
 
