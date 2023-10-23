@@ -1,6 +1,8 @@
-// Function to display messages to the user using a popup (alert)
+const popup = require("./popup.js");
+
+// Function to display messages to the user using a popup
 const showMessage = (message) => {
-  alert(message);
+  popup.sendMessage(popup.messageType.important, message, 2.5);
 };
 
 // Function to handle the response from the server
@@ -39,10 +41,9 @@ const handleResponse = async (response, method) => {
   if (contentType && contentType.includes("application/json")) {
     const obj = await response.json();
     console.log(obj);
-  }
-  // Normally, this wouldn't happen because we are using JSON only.
-  // But we still want to handle other types if unexpected behavior occurs.
-  else {
+  } else {
+    // Normally, this wouldn't happen because we are using JSON only.
+    // But we still want to handle other types if unexpected behavior occurs.
     console.error("Unhandled content type:", contentType);
   }
 };
@@ -64,6 +65,36 @@ const sendRequest = (url, method, body) => {
       console.error("Error:", error);
       showMessage(`Error: ${error.message}`);
     });
+};
+
+let totalRunTime = 0;
+let deltaTime = 0;
+let previousTotalRunTime = 0;
+
+const update = () => {
+  popup.update(deltaTime);
+};
+
+/**
+ * Continuously updates app data and graphics using requestAnimationFrame.
+ * The animation callbacks will be paused if the tab is inactive.
+ * For regular time-based executions, consider using window.setTimeout/setInterval.
+ * @param {number} realtimeSinceStartup time since the page is loaded in milliseconds
+ */
+const mainLoop = (realtimeSinceStartup) => {
+  // Calculates delta time in seconds
+  totalRunTime = realtimeSinceStartup / 1000;
+  deltaTime = totalRunTime - previousTotalRunTime;
+
+  // In case of any lags, cap deltaTime to a maximum value.
+  if (deltaTime > 1 / 10) deltaTime = 1 / 10;
+
+  update();
+
+  previousTotalRunTime = totalRunTime;
+
+  // When the current frame is processed, requests for the next.
+  window.requestAnimationFrame(mainLoop);
 };
 
 // Initialize the event listeners on page load
@@ -89,6 +120,18 @@ const init = () => {
       showMessage("Message must be between 5 and 1000 characters long!");
     }
   });
+
+  // Setup popup overlay
+  popup.setCurrentOverlay(document.getElementById("popupOverlay"));
+
+  // Start the main loop
+  window.requestAnimationFrame(mainLoop);
 };
 
 window.onload = init;
+
+const getDeltaTime = () => deltaTime;
+
+module.exports = {
+  getDeltaTime,
+};
