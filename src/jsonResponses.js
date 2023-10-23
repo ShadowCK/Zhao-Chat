@@ -23,7 +23,7 @@ const fetchBottleCore = (params = {}) => {
     return {
       status: 404,
       responseJSON: {
-        message: 'Bottle not found.',
+        message: 'You stirred the water and nothing happens.',
         id: 'notFound',
       },
     };
@@ -166,7 +166,7 @@ const addBottle = async (request, response) => {
 // 404 Not Found response
 const getNotFound = (request, response) => {
   const responseJSON = {
-    message: 'The page you are looking for was not found.',
+    message: 'The resource you are looking for was not found.',
     id: 'notFound',
   };
   respondJSON(request, response, 404, responseJSON);

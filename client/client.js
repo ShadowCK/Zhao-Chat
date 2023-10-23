@@ -17,33 +17,6 @@ const handleResponse = async (response, method, callbacks = {}) => {
     preProcess(response, method);
   }
 
-  // Based on the response status, show relevant message to the user
-  switch (response.status) {
-    case 200:
-      popup.sendMessage(popup.messageType.important, 'Success', settings.successPopupDuration);
-      break;
-    case 201:
-      popup.sendMessage(popup.messageType.important, 'Created', settings.successPopupDuration);
-      break;
-    case 204:
-      popup.sendMessage(
-        popup.messageType.important,
-        'Updated(No Content)',
-        settings.successPopupDuration,
-      );
-      break;
-    case 400:
-      popup.sendError('Bad Request', settings.errorPopupDuration);
-      break;
-    case 500:
-      popup.sendError('Internal Server Error', settings.errorPopupDuration);
-      break;
-    case 404:
-    default:
-      popup.sendError('Not Found', settings.errorPopupDuration);
-      break;
-  }
-
   // For HEAD request or a status of 204, no content is expected.
   if (method === 'HEAD' || response.status === 204) {
     if (onNoContent) {
@@ -69,6 +42,7 @@ const handleResponse = async (response, method, callbacks = {}) => {
   } else {
     // Normally, this wouldn't happen because we are using JSON only.
     // But we still want to handle other types if unexpected behavior occurs.
+    // For example, someone can use Postman to send custom requests directly to our server.
     console.error('Unhandled content type:', contentType);
     if (onError) {
       onError(response, method);
@@ -182,9 +156,18 @@ const init = () => {
       'POST',
       { id: currentBottle.id },
       {
+        onJSONParsed: (response, method, obj) => {
+          if (response.status === 400 || response.status === 404) {
+            popup.sendError(obj.message, settings.errorPopupDuration);
+          }
+        },
         postProcess: (response) => {
           if (response.status === 204) {
-            console.log('Bottle discarded!');
+            popup.sendMessage(
+              popup.messageType.important,
+              'Bottle discarded!',
+              settings.successPopupDuration,
+            );
           }
           // "Discard" whether bottle is successfully discarded on the server side
           driftBottleOut();
@@ -208,9 +191,18 @@ const init = () => {
       'POST',
       { id: currentBottle.id },
       {
+        onJSONParsed: (response, method, obj) => {
+          if (response.status === 400 || response.status === 404) {
+            popup.sendError(obj.message, settings.errorPopupDuration);
+          }
+        },
         postProcess: (response) => {
           if (response.status === 204) {
-            console.log('Bottle destroyed!');
+            popup.sendMessage(
+              popup.messageType.important,
+              'Bottle destroyed!',
+              settings.successPopupDuration,
+            );
           }
           // "Destroy" whether bottle is successfully discarded on the server side
           // TODO: the bottle should not drift out but directly disappear.
@@ -253,8 +245,15 @@ const init = () => {
       },
       onJSONParsed: (response, method, data) => {
         if (response.status === 404) {
+          popup.sendError(data.message, settings.errorPopupDuration);
           return; // Exit if no bottle is found
         }
+        // 200 Success
+        popup.sendMessage(
+          popup.messageType.important,
+          'Wild Bottle appeared!',
+          settings.successPopupDuration,
+        );
         currentBottle = data;
         document.getElementById('bottleContent').innerHTML = utils.formatBottleContent(currentBottle);
         driftBottleToCenter();
@@ -269,7 +268,25 @@ const init = () => {
   sendMessageBtn.addEventListener('click', () => {
     const message = messageInput.value.trim();
     if (message.length >= 5 && message.length <= 1000) {
-      sendRequest('/addBottle', 'POST', { message });
+      sendRequest(
+        '/addBottle',
+        'POST',
+        { message },
+        {
+          onJSONParsed: (response, method, data) => {
+            if (response.status === 400) {
+              popup.sendError(data.message, settings.errorPopupDuration);
+              return;
+            }
+            // 201 Created
+            popup.sendMessage(
+              popup.messageType.important,
+              'You created a bottle out of nowhere!',
+              settings.successPopupDuration,
+            );
+          },
+        },
+      );
       messageInput.value = ''; // Clear the input after sending
     } else {
       popup.sendError(
