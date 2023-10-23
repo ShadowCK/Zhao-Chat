@@ -20,14 +20,28 @@
     </section>
 
     <!-- Drift Bottle Animation and Popup Overlay Section -->
-    <section class="section drift-bottle-section">
+    <section id="driftBottleSection" class="section">
       <div class="container">
         <div id="popupOverlay" class="popupOverlay"></div>
-        <div id="bottleDisplay" class="box" style="display: none">
-          <!-- Bottle Content will be displayed here -->
-          <!-- Additional actions like "throw back into the river", "destroy", "close window" can be added here -->
+        <!-- Popup window for bottle content -->
+        <div id="bottleDisplay" class="modal" style="display: none">
+          <div class="modal-background"></div>
+          <div class="modal-card">
+            <header class="modal-card-head">
+              <p class="modal-card-title">Bottle Actions</p>
+              <button id="closePopup" class="delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+              <p id="bottleContent">Bottle Content will be displayed here.</p>
+            </section>
+            <footer class="modal-card-foot">
+              <button id="discardBottle" class="button is-danger">Discard</button>
+              <button id="destroyBottle" class="button is-warning">Destroy</button>
+            </footer>
+          </div>
         </div>
-        <!-- Markup for drift bottle animation can be added here -->
+        <!-- Markup for drift bottle animation -->
+        <button id="bottle" class="button is-light">Bottle</button>
       </div>
     </section>
 

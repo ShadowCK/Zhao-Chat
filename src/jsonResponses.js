@@ -14,8 +14,8 @@ const respondJSONMeta = (request, response, status) => {
 };
 
 // Fetch a bottle by id or, if no id is given, a random bottle and return as JSON
-const fetchBottleCore = (params) => {
-  const fetchedBottle = params.id ? data.getBottleById(params.id) : data.fetchRandomBottle();
+const fetchBottleCore = (params = {}) => {
+  const fetchedBottle = params.id ? data.fetchBottleById(params.id) : data.fetchRandomBottle();
 
   if (!fetchedBottle) {
     return {
@@ -57,7 +57,12 @@ const getBody = (request) => new Promise((resolve, reject) => {
   });
 
   request.on('end', () => {
-    resolve(body);
+    try {
+      const parsedBody = JSON.parse(body);
+      resolve(parsedBody);
+    } catch (error) {
+      reject(new Error('Invalid JSON in request body.'));
+    }
   });
 
   request.on('error', (err) => {

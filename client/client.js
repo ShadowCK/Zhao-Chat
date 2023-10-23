@@ -99,17 +99,64 @@ const init = () => {
   const fetchBottleBtn = document.querySelector('#fetchBottle');
   const sendMessageBtn = document.querySelector('#sendMessage');
   const messageInput = document.querySelector('#messageInput');
+  const bottle = document.getElementById('bottle');
+  const bottleDisplay = document.getElementById('bottleDisplay');
+  const closePopupBtn = document.getElementById('closePopup');
+  const discardBottleBtn = document.getElementById('discardBottle');
+  const destroyBottleBtn = document.getElementById('destroyBottle');
 
-  // Fetch a bottle when the relevant button is clicked
+  let currentBottleId = null;
+
+  // Handlers
+  const driftBottleToCenter = () => {
+    bottle.classList.add('bottle-showup');
+    bottle.classList.remove('bottle-discard');
+  };
+
+  const driftBottleOut = () => {
+    bottle.classList.remove('bottle-showup');
+    bottle.classList.add('bottle-discard');
+  };
+
+  bottle.addEventListener('click', () => {
+    if (bottle.classList.contains('bottle-showup')) {
+      bottleDisplay.style.display = 'block';
+    }
+  });
+
+  closePopupBtn.addEventListener('click', () => {
+    bottleDisplay.style.display = 'none';
+  });
+
+  discardBottleBtn.addEventListener('click', () => {
+    driftBottleOut();
+    sendRequest('/discardBottle', 'POST', { id: currentBottleId });
+    currentBottleId = null;
+  });
+
+  destroyBottleBtn.addEventListener('click', () => {
+    sendRequest('/destroyBottle', 'POST', { id: currentBottleId });
+    driftBottleOut();
+    currentBottleId = null;
+  });
+
   fetchBottleBtn.addEventListener('click', () => {
-    sendRequest('/fetchBottle', 'GET');
+    // If there's a bottle in the center, discard it first
+    if (currentBottleId) {
+      discardBottleBtn.click();
+    }
+
+    sendRequest('/fetchBottle', 'GET', (response) => {
+      currentBottleId = response.id;
+      driftBottleToCenter();
+    });
   });
 
   // Send a message when the relevant button is clicked
   sendMessageBtn.addEventListener('click', () => {
     const message = messageInput.value.trim();
     if (message.length >= 5 && message.length <= 1000) {
-      sendRequest('/sendMessage', 'POST', { message });
+      sendRequest('/addBottle', 'POST', { message });
       messageInput.value = ''; // Clear the input after sending
     } else {
       popup.sendError('Message must be between 5 and 1000 characters long!', 2.5);

@@ -14,6 +14,7 @@ const addBottle = (message) => {
     views: 0, // Initial view count
   };
   availableBottles.push(bottle);
+  return bottle;
 };
 
 const fetchBottleById = (id) => {

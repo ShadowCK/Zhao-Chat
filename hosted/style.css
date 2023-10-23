@@ -108,7 +108,7 @@ body {
   }
 }
 
-.drift-bottle-section {
+#driftBottleSection {
   background-color: #209cee; /* Bulma's primary blue color */
   padding: 50px 0; /* Increase padding to make the section more prominent */
   border-top: 5px solid rgba(32, 156, 238, 0.2); /* Lighter blue border at the top */
@@ -116,7 +116,7 @@ body {
   position: relative; /* To allow positioning of inner elements if needed */
 }
 
-.drift-bottle-section::before {
+#driftBottleSection::before {
   content: "";
   position: absolute;
   top: 0;
@@ -133,6 +133,27 @@ body {
   animation: shimmer 5s infinite linear;
 }
 
-.drift-bottle-section .container {
+#driftBottleSection .container {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  max-width: none;
   min-height: 30vh; /* Make the river section taller */
+  position: relative;
+}
+
+#bottle {
+  position: absolute;
+  right: -20%;
+  z-index: 1;
+  transition: right 2s ease-in-out;
+}
+
+#bottle.bottle-discard {
+  right: 120%;
+}
+
+#bottle.bottle-showup {
+  right: 50%;
 }
