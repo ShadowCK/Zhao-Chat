@@ -15,8 +15,9 @@ const respondJSONMeta = (request, response, status) => {
 
 // Fetch a bottle by id or, if no id is given, a random bottle and return as JSON
 const fetchBottleCore = (params = {}) => {
+  const includeArchived = params['include-archived'] === '' || params['include-archived'] === 'true';
   const fetchedBottle = params.id
-    ? data.fetchBottleById(params.id, params['include-archived'])
+    ? data.fetchBottleById(params.id, includeArchived)
     : data.fetchRandomBottle();
 
   if (!fetchedBottle) {
