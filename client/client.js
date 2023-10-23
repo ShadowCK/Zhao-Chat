@@ -1,32 +1,27 @@
 const popup = require('./popup.js');
 
-// Function to display messages to the user using a popup
-const showMessage = (message) => {
-  popup.sendMessage(popup.messageType.important, message, 2.5);
-};
-
 // Function to handle the response from the server
 const handleResponse = async (response, method) => {
   // Based on the response status, show relevant message to the user
   switch (response.status) {
     case 200:
-      showMessage('Success');
+      popup.sendMessage(popup.messageType.important, 'Success', 2.5);
       break;
     case 201:
-      showMessage('Created');
+      popup.sendMessage(popup.messageType.important, 'Created', 2.5);
       break;
     case 204:
-      showMessage('Updated(No Content)');
+      popup.sendMessage(popup.messageType.important, 'Updated(No Content)', 2.5);
       break;
     case 400:
-      showMessage('Bad Request');
+      popup.sendError('Bad Request', 2.5);
       break;
     case 500:
-      showMessage('Internal Server Error');
+      popup.sendError('Internal Server Error', 2.5);
       break;
     case 404:
     default:
-      showMessage('Not Found');
+      popup.sendError('Not Found', 2.5);
       break;
   }
 
@@ -63,7 +58,7 @@ const sendRequest = (url, method, body) => {
     .then((response) => handleResponse(response, method))
     .catch((error) => {
       console.error('Error:', error);
-      showMessage(`Error: ${error.message}`);
+      popup.sendError(`Error: ${error.message}`);
     });
 };
 
@@ -117,7 +112,7 @@ const init = () => {
       sendRequest('/sendMessage', 'POST', { message });
       messageInput.value = ''; // Clear the input after sending
     } else {
-      showMessage('Message must be between 5 and 1000 characters long!');
+      popup.sendError('Message must be between 5 and 1000 characters long!');
     }
   });
 
