@@ -16,11 +16,11 @@ const onRequest = (request, response) => {
   const { pathname } = parsedUrl;
   const params = query.parse(parsedUrl.query);
 
-  console.log(`${request.method} ${pathname} - ${JSON.stringify(params)}`);
-
   // Check Accept header to determine response format, default to json
   const acceptHeader = request.headers.accept || 'application/json';
   const acceptedTypes = acceptHeader.split(',');
+
+  console.log(`${request.method} ${pathname} - ${JSON.stringify(params)} - ${acceptedTypes}`);
 
   const handler = router.getHandler(method, pathname, acceptedTypes);
   handler(request, response, params);

@@ -17,8 +17,12 @@ const addBottle = (message) => {
   return bottle;
 };
 
-const fetchBottleById = (id) => {
-  const result = _.findWhere(availableBottles, { id }) || _.findWhere(inReviewBottles, { id });
+// Fetch a bottle with specified id
+const fetchBottleById = (id, includeArchived = false) => {
+  let result = _.findWhere(availableBottles, { id }) || _.findWhere(inReviewBottles, { id });
+  if (includeArchived && !result) {
+    result = _.findWhere(archivedBottles, { id });
+  }
   return result;
 };
 

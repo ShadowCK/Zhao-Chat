@@ -21,6 +21,7 @@ const urlStruct = {
       '/': htmlHandler.getIndex,
       '/style.css': htmlHandler.getCSS,
       '/bundle.js': htmlHandler.getBundle,
+      '/fetchBottle': jsonHandler.fetchBottle, // For browser access to the endpoint
     },
   },
   default: jsonHandler.getNotFound, // Default 404 handler
