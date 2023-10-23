@@ -20,6 +20,8 @@ const urlStruct = {
     GET: {
       '/': htmlHandler.getIndex,
       '/style.css': htmlHandler.getCSS,
+      '/bulma.css': htmlHandler.getBulma,
+      '/bulma-tooltip.css': htmlHandler.getBulmaTooltip,
       '/bundle.js': htmlHandler.getBundle,
       '/android-chrome-192x192.png': htmlHandler.getAndroidChrome192,
       '/android-chrome-512x512.png': htmlHandler.getAndroidChrome512,

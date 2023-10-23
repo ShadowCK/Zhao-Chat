@@ -10,6 +10,9 @@ const serveFile = (response, file, contentType) => {
 const index = fs.readFileSync(`${__dirname}/../hosted/client.html`);
 // CSS for the home page
 const css = fs.readFileSync(`${__dirname}/../hosted/style.css`);
+const bulma = fs.readFileSync(`${__dirname}/../hosted/bulma.css`);
+const bulmaTooltip = fs.readFileSync(`${__dirname}/../hosted/bulma-tooltip.css`);
+
 // Bundled js
 const bundle = fs.readFileSync(`${__dirname}/../hosted/bundle.js`);
 
@@ -19,6 +22,13 @@ const getIndex = (request, response) => {
 
 const getCSS = (request, response) => {
   serveFile(response, css, 'text/css');
+};
+
+const getBulma = (request, response) => {
+  serveFile(response, bulma, 'text/css');
+};
+const getBulmaTooltip = (request, response) => {
+  serveFile(response, bulmaTooltip, 'text/css');
 };
 
 const getBundle = (request, response) => {
@@ -80,6 +90,8 @@ const getWebManifest = (request, response) => {
 module.exports = {
   getIndex,
   getCSS,
+  getBulma,
+  getBulmaTooltip,
   getBundle,
   getAndroidChrome192,
   getAndroidChrome512,
