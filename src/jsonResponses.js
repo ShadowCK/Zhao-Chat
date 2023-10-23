@@ -49,49 +49,111 @@ const fetchBottleMeta = (request, response, params) => {
   respondJSONMeta(request, response, result.status);
 };
 
+const getBody = (request) => new Promise((resolve, reject) => {
+  let body = '';
+
+  request.on('data', (chunk) => {
+    body += chunk;
+  });
+
+  request.on('end', () => {
+    resolve(body);
+  });
+
+  request.on('error', (err) => {
+    reject(err);
+  });
+});
+
 // Discard a specific bottle by ID
-const discardBottle = (request, response, params) => {
-  const { id } = params;
-  const discarded = data.discardBottle(id);
-  if (discarded) {
-    respondJSONMeta(request, response, 204);
-  } else {
+const discardBottle = async (request, response) => {
+  try {
+    const body = await getBody(request);
+    const { id } = body;
+    if (!id) {
+      const responseJSON = {
+        message: 'Missing bottle ID.',
+        id: 'missingParams',
+      };
+      respondJSON(request, response, 400, responseJSON);
+      return;
+    }
+
+    const discarded = data.discardBottle(id);
+    if (discarded) {
+      respondJSONMeta(request, response, 204);
+    } else {
+      const responseJSON = {
+        message: 'Bottle not found.',
+        id: 'notFound',
+      };
+      respondJSON(request, response, 404, responseJSON);
+    }
+  } catch (error) {
     const responseJSON = {
-      message: 'Bottle not found.',
-      id: 'notFound',
+      message: 'Bad request body.',
+      id: 'badRequest',
     };
-    respondJSON(request, response, 404, responseJSON);
+    respondJSON(request, response, 400, responseJSON);
   }
 };
 
 // Destroy a specific bottle by ID
-const destroyBottle = (request, response, params) => {
-  const { id } = params;
-  const destroyed = data.destroyBottle(id);
-  if (destroyed) {
-    respondJSONMeta(request, response, 204);
-  } else {
+const destroyBottle = async (request, response) => {
+  try {
+    const body = await getBody(request);
+    const { id } = body;
+    if (!id) {
+      const responseJSON = {
+        message: 'Missing bottle ID.',
+        id: 'missingParams',
+      };
+      respondJSON(request, response, 400, responseJSON);
+      return;
+    }
+
+    const destroyed = data.destroyBottle(id);
+    if (destroyed) {
+      respondJSONMeta(request, response, 204);
+    } else {
+      const responseJSON = {
+        message: 'Bottle not found.',
+        id: 'notFound',
+      };
+      respondJSON(request, response, 404, responseJSON);
+    }
+  } catch (error) {
     const responseJSON = {
-      message: 'Bottle not found.',
-      id: 'notFound',
+      message: 'Bad request body.',
+      id: 'badRequest',
     };
-    respondJSON(request, response, 404, responseJSON);
+    respondJSON(request, response, 400, responseJSON);
   }
 };
 
 // Add a new bottle with the given message and respond with the created bottle
-const addBottle = (request, response, params) => {
-  if (!params.message || params.message === '') {
+const addBottle = async (request, response) => {
+  try {
+    const body = await getBody(request);
+    const { message } = body;
+    if (!message || message === '') {
+      const responseJSON = {
+        message: 'A message is required.',
+        id: 'missingParams',
+      };
+      respondJSON(request, response, 400, responseJSON);
+      return;
+    }
+
+    const newBottle = data.addBottle(message);
+    respondJSON(request, response, 201, newBottle);
+  } catch (error) {
     const responseJSON = {
-      message: 'A message is required.',
-      id: 'missingParams',
+      message: 'Bad request body.',
+      id: 'badRequest',
     };
     respondJSON(request, response, 400, responseJSON);
-    return;
   }
-
-  const newBottle = data.addBottle(params.message);
-  respondJSON(request, response, 201, newBottle);
 };
 
 // 404 Not Found response

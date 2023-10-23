@@ -3,10 +3,18 @@ const htmlHandler = require('./htmlResponses.js');
 const jsonHandler = require('./jsonResponses.js');
 
 const urlStruct = {
-  // TODO: Add API handlers
   json: {
-    GET: {},
-    HEAD: {},
+    GET: {
+      '/fetchBottle': jsonHandler.fetchBottle, // Fetching a bottle, either random or by ID
+    },
+    HEAD: {
+      '/fetchBottle': jsonHandler.fetchBottleMeta, // HEAD request for fetching a bottle
+    },
+    POST: {
+      '/discardBottle': jsonHandler.discardBottle, // Discarding a specific bottle
+      '/destroyBottle': jsonHandler.destroyBottle, // Destroying a specific bottle
+      '/addBottle': jsonHandler.addBottle, // Adding a new bottle with a given message
+    },
   },
   html: {
     GET: {
@@ -15,7 +23,7 @@ const urlStruct = {
       '/bundle.js': htmlHandler.getBundle,
     },
   },
-  default: jsonHandler.getNotFound,
+  default: jsonHandler.getNotFound, // Default 404 handler
 };
 
 // Maps MIME types to handler types in the urlStruct. This is mainly for clarity purpose,
