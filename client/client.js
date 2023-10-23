@@ -8,6 +8,15 @@ const eventEmitter = new EventEmitter();
 
 // Function to handle the response from the server
 const handleResponse = async (response, method, callbacks = {}) => {
+  const filteredCallbacks = _.pick(callbacks, (value) => _.isFunction(value));
+  const {
+    preProcess, onNoContent, onJSONParsed, onError, postProcess,
+  } = filteredCallbacks;
+
+  if (preProcess) {
+    preProcess(response, method);
+  }
+
   // Based on the response status, show relevant message to the user
   switch (response.status) {
     case 200:
@@ -34,12 +43,6 @@ const handleResponse = async (response, method, callbacks = {}) => {
       popup.sendError('Not Found', settings.errorPopupDuration);
       break;
   }
-
-  const filteredCallbacks = _.pick(callbacks, (value) => _.isFunction(value));
-
-  const {
-    onNoContent, onJSONParsed, onError, postProcess,
-  } = filteredCallbacks;
 
   // For HEAD request or a status of 204, no content is expected.
   if (method === 'HEAD' || response.status === 204) {
@@ -153,6 +156,12 @@ const init = () => {
     bottleDisplay.style.display = 'none'; // Close the bottle content display
   };
 
+  const resetBottle = () => {
+    bottle.style.transition = 'none'; // Temporarily disable transition
+    bottle.classList.remove('bottle-showup', 'bottle-discard');
+    // We will re-enable the transition in the fetchBottle callback
+  };
+
   bottle.addEventListener('click', () => {
     if (bottle.classList.contains('bottle-showup')) {
       bottleDisplay.style.display = 'block';
@@ -167,9 +176,6 @@ const init = () => {
     if (!currentBottle) {
       return;
     }
-
-    console.log('curernt bottle');
-    console.log(currentBottle);
 
     sendRequest(
       '/discardBottle',
@@ -207,7 +213,8 @@ const init = () => {
             console.log('Bottle destroyed!');
           }
           // "Destroy" whether bottle is successfully discarded on the server side
-          // TODO: the bottle should not drifted out but directly disappear
+          // TODO: the bottle should not drift out but directly disappear.
+          // The distinct visuals would make better user experience.
           driftBottleOut();
           currentBottle = null;
         },
@@ -225,7 +232,10 @@ const init = () => {
 
     if (currentBottle) {
       discardCurrentBottle(() => {
-        eventEmitter.emit('fetchBottle');
+        // Wait until discard animation is finished
+        setTimeout(() => {
+          eventEmitter.emit('fetchBottle');
+        }, settings.bottleTransitionDuration * 1000);
       });
     } else {
       eventEmitter.emit('fetchBottle');
@@ -234,7 +244,13 @@ const init = () => {
 
   // Listen for the fetchBottle event
   eventEmitter.on('fetchBottle', () => {
+    // Reset the bottle every time a new one is requested
+    resetBottle();
+
     sendRequest('/fetchBottle', 'GET', null, {
+      preProcess: () => {
+        bottle.style.transition = ''; // Re-enable the transition by removing inline style
+      },
       onJSONParsed: (response, method, data) => {
         if (response.status === 404) {
           return; // Exit if no bottle is found

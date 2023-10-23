@@ -9,8 +9,7 @@ const createElement = (tagName, attributes = {}, properties = {}) => {
   return element;
 };
 
-function formatBottleContent(bottle) {
-  return `
+const formatBottleContent = (bottle) => `
     <div class="content">
       <span class="tag is-info">Bottle ID</span> ${bottle.id}
       <br>
@@ -25,7 +24,6 @@ function formatBottleContent(bottle) {
       </div>
     </div>
   `;
-}
 
 module.exports = {
   createElement,
