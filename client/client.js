@@ -1,7 +1,12 @@
+const EventEmitter = require('events'); // Node.js built-in module
+const _ = require('underscore');
 const popup = require('./popup.js');
+const utils = require('./utils.js');
+
+const eventEmitter = new EventEmitter();
 
 // Function to handle the response from the server
-const handleResponse = async (response, method) => {
+const handleResponse = async (response, method, callbacks = {}) => {
   // Based on the response status, show relevant message to the user
   switch (response.status) {
     case 200:
@@ -25,8 +30,20 @@ const handleResponse = async (response, method) => {
       break;
   }
 
+  const filteredCallbacks = _.pick(callbacks, (value) => _.isFunction(value));
+
+  const {
+    onNoContent, onJSONParsed, onError, postProcess,
+  } = filteredCallbacks;
+
   // For HEAD request or a status of 204, no content is expected.
   if (method === 'HEAD' || response.status === 204) {
+    if (onNoContent) {
+      onNoContent(response, method);
+    }
+    if (postProcess) {
+      postProcess(response, method);
+    }
     return;
   }
 
@@ -36,15 +53,26 @@ const handleResponse = async (response, method) => {
   if (contentType && contentType.includes('application/json')) {
     const obj = await response.json();
     console.log(obj);
+
+    // Execute callback with parsed json obj
+    if (onJSONParsed) {
+      onJSONParsed(response, method, obj);
+    }
   } else {
     // Normally, this wouldn't happen because we are using JSON only.
     // But we still want to handle other types if unexpected behavior occurs.
     console.error('Unhandled content type:', contentType);
+    if (onError) {
+      onError(response, method);
+    }
+  }
+  if (postProcess) {
+    postProcess(response, method);
   }
 };
 
 // Function to send a request to the server
-const sendRequest = (url, method, body) => {
+const sendRequest = (url, method, body, callbacks = {}) => {
   fetch(url, {
     method,
     // We only use json in this application
@@ -55,7 +83,7 @@ const sendRequest = (url, method, body) => {
     // Stringify the body if it exists, else it will be treated as undefined (no body)
     body: body ? JSON.stringify(body) : undefined,
   })
-    .then((response) => handleResponse(response, method))
+    .then((response) => handleResponse(response, method, callbacks))
     .catch((error) => {
       console.error('Error:', error);
       popup.sendError(`Error: ${error.message}`, 2.5);
@@ -65,6 +93,7 @@ const sendRequest = (url, method, body) => {
 let totalRunTime = 0;
 let deltaTime = 0;
 let previousTotalRunTime = 0;
+let canFetchBottle = true;
 
 const update = () => {
   popup.update(deltaTime);
@@ -105,7 +134,7 @@ const init = () => {
   const discardBottleBtn = document.getElementById('discardBottle');
   const destroyBottleBtn = document.getElementById('destroyBottle');
 
-  let currentBottleId = null;
+  let currentBottle = null;
 
   // Handlers
   const driftBottleToCenter = () => {
@@ -116,6 +145,7 @@ const init = () => {
   const driftBottleOut = () => {
     bottle.classList.remove('bottle-showup');
     bottle.classList.add('bottle-discard');
+    bottleDisplay.style.display = 'none'; // Close the bottle content display
   };
 
   bottle.addEventListener('click', () => {
@@ -128,27 +158,89 @@ const init = () => {
     bottleDisplay.style.display = 'none';
   });
 
+  const discardCurrentBottle = (callback) => {
+    if (!currentBottle) {
+      return;
+    }
+
+    console.log('curernt bottle');
+    console.log(currentBottle);
+
+    sendRequest(
+      '/discardBottle',
+      'POST',
+      { id: currentBottle.id },
+      {
+        postProcess: (response) => {
+          if (response.status === 204) {
+            console.log('Bottle discarded!');
+          }
+          // "Discard" whether bottle is successfully discarded on the server side
+          driftBottleOut();
+          currentBottle = null;
+
+          if (callback && typeof callback === 'function') {
+            callback();
+          }
+        },
+      },
+    );
+  };
+
   discardBottleBtn.addEventListener('click', () => {
-    driftBottleOut();
-    sendRequest('/discardBottle', 'POST', { id: currentBottleId });
-    currentBottleId = null;
+    discardCurrentBottle();
   });
 
   destroyBottleBtn.addEventListener('click', () => {
-    sendRequest('/destroyBottle', 'POST', { id: currentBottleId });
-    driftBottleOut();
-    currentBottleId = null;
+    sendRequest(
+      '/destroyBottle',
+      'POST',
+      { id: currentBottle.id },
+      {
+        postProcess: (response) => {
+          if (response.status === 204) {
+            console.log('Bottle destroyed!');
+          }
+          // "Destroy" whether bottle is successfully discarded on the server side
+          // TODO: the bottle should not drifted out but directly disappear
+          driftBottleOut();
+          currentBottle = null;
+        },
+      },
+    );
   });
 
   fetchBottleBtn.addEventListener('click', () => {
-    // If there's a bottle in the center, discard it first
-    if (currentBottleId) {
-      discardBottleBtn.click();
+    if (!canFetchBottle) {
+      return;
     }
 
-    sendRequest('/fetchBottle', 'GET', (response) => {
-      currentBottleId = response.id;
-      driftBottleToCenter();
+    // The user can't ask for new bottles until the current request is handled
+    canFetchBottle = false;
+
+    if (currentBottle) {
+      discardCurrentBottle(() => {
+        eventEmitter.emit('fetchBottle');
+      });
+    } else {
+      eventEmitter.emit('fetchBottle');
+    }
+  });
+
+  // Listen for the fetchBottle event
+  eventEmitter.on('fetchBottle', () => {
+    sendRequest('/fetchBottle', 'GET', null, {
+      onJSONParsed: (response, method, data) => {
+        if (response.status === 404) {
+          return; // Exit if no bottle is found
+        }
+        currentBottle = data;
+        document.getElementById('bottleContent').innerHTML = utils.formatBottleContent(currentBottle);
+        driftBottleToCenter();
+      },
+      postProcess: () => {
+        canFetchBottle = true;
+      },
     });
   });
 

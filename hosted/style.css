@@ -157,3 +157,11 @@ body {
 #bottle.bottle-showup {
   right: 50%;
 }
+
+#bottleContent .card * {
+  transition: background-color 0.5s ease-in-out;
+}
+
+#bottleContent .card:hover * {
+  background-color: hsl(0, 0%, 98%) !important;
+}
