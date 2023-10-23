@@ -17,7 +17,17 @@ const addBottle = (message) => {
   return bottle;
 };
 
-// Fetch a bottle with specified id
+/**
+ * Retrieves a bottle's information based on its ID.
+ * This function is primarily used for administrative purposes:
+ *  - Can access bottles even if they're under review or archived.
+ *  - Does not increment the view count of the retrieved bottle.
+ *
+ * @param {string} id - The ID of the bottle to fetch.
+ * @param {boolean} includeArchived - Whether to search within archived bottles.
+ * @return {Object|null} The found bottle object, or null if not found.
+ */
+
 const fetchBottleById = (id, includeArchived = false) => {
   let result = _.findWhere(availableBottles, { id }) || _.findWhere(inReviewBottles, { id });
   if (includeArchived && !result) {

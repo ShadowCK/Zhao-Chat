@@ -4,6 +4,10 @@
     <title>Zhao Drift</title>
     <!-- Bulma CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@creativebulma/bulma-tooltip@1.2.0/dist/bulma-tooltip.min.css"
+    />
     <!-- Our own style sheet -->
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <!-- Bundled client script -->
@@ -28,15 +32,16 @@
           <div class="modal-background"></div>
           <div class="modal-card">
             <header class="modal-card-head">
-              <p class="modal-card-title">Bottle Actions</p>
+              <p class="modal-card-title">Bottle Info</p>
               <button id="closePopup" class="delete" aria-label="close"></button>
             </header>
             <section class="modal-card-body">
               <p id="bottleContent">Bottle Content will be displayed here.</p>
             </section>
-            <footer class="modal-card-foot">
-              <button id="discardBottle" class="button is-danger">Discard</button>
-              <button id="destroyBottle" class="button is-warning">Destroy</button>
+            <footer class="modal-card-foot is-flex is-justify-content-center">
+              <button id="discardBottle" class="button is-warning tooltip" data-tooltip="Toss back for another to find!">Discard</button>
+              <button id="destroyBottle" class="button is-danger tooltip" data-tooltip="Shatter the secrets within!">Destroy</button>
+          </footer>
             </footer>
           </div>
         </div>
@@ -70,7 +75,13 @@
           <!-- Fetch Bottle Section -->
           <div class="column is-6 is-centered-column">
             <div class="has-text-centered">
-              <button class="button is-primary" id="fetchBottle">Fetch Bottle</button>
+              <button
+                class="button is-primary"
+                id="fetchBottle"
+                data-tooltip="Retrieve a mystery message!"
+              >
+                Fetch Bottle
+              </button>
             </div>
           </div>
         </div>

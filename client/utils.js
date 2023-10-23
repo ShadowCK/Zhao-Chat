@@ -15,6 +15,8 @@ function formatBottleContent(bottle) {
       <span class="tag is-info">Bottle ID</span> ${bottle.id}
       <br>
       <span class="tag is-success">Date</span> ${new Date(bottle.date).toLocaleString()}
+      <br>
+      <span class="tag is-primary">Views</span> ${bottle.views}
       <br><br>
       <div class="card">
         <div class="card-content">
