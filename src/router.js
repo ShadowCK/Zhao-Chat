@@ -21,6 +21,16 @@ const urlStruct = {
       '/': htmlHandler.getIndex,
       '/style.css': htmlHandler.getCSS,
       '/bundle.js': htmlHandler.getBundle,
+      '/android-chrome-192x192.png': htmlHandler.getAndroidChrome192,
+      '/android-chrome-512x512.png': htmlHandler.getAndroidChrome512,
+      '/apple-touch-icon.png': htmlHandler.getAppleTouchIcon,
+      '/browserconfig.xml': htmlHandler.getBrowserConfig,
+      '/favicon.ico': htmlHandler.getFaviconIco,
+      '/favicon-16x16.png': htmlHandler.getFavicon16,
+      '/favicon-32x32.png': htmlHandler.getFavicon32,
+      '/mstile-150x150.png': htmlHandler.getMstile150,
+      '/safari-pinned-tab.svg': htmlHandler.getSafariPinnedTab,
+      '/site.webmanifest': htmlHandler.getWebManifest,
       '/fetchBottle': jsonHandler.fetchBottle, // For browser access to the endpoint
     },
   },
@@ -34,10 +44,17 @@ const MIMETypeToHandlerType = {
   'text/html': 'html',
   'text/css': 'html',
   'application/javascript': 'html',
+  'image/avif': 'html',
+  'image/webp': 'html',
+  'image/apng': 'html',
+  'image/svg+xml': 'html',
 };
 
 const getHandler = (requestMethod, pathname, acceptedTypes) => {
   let handler = null;
+  // TODO: we shouldn't just check all for "*/*" as the first element.
+  // Many acceptedTypes have "*/*" as the last element.
+  // Checking all handlers should always be the fallback.
   const isAnyType = acceptedTypes[0] === '*/*';
 
   // Map the MIME types to our handler types. If wildcard is used, add all types.
