@@ -301,6 +301,10 @@ const init = () => {
 
   // Start the main loop
   window.requestAnimationFrame(mainLoop);
+
+  window.addEventListener('unload', () => {
+    discardCurrentBottle();
+  });
 };
 
 window.onload = init;
