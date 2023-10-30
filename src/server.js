@@ -39,8 +39,10 @@ http.createServer(onRequest).listen(port, () => {
 setInterval(() => {
   now = Date.now();
   deltaTime = (now - lastUpdateTime) / 1000;
+
   // #region Main Body
   data.update(deltaTime);
   // #endregion
+
   lastUpdateTime = now;
 }, 1000);

@@ -8,6 +8,13 @@ const archivedBottles = [];
 const bottleIdleTimes = {};
 const reviewTimeout = 10; // seconds
 
+const BottleStatus = Object.freeze({
+  Available: 'available',
+  InReview: 'inReview',
+  Archived: 'archived',
+  NotFound: 'notFound',
+});
+
 // Add a new bottle with a unique ID, message, date, and view count to availableBottles
 const addBottle = (message) => {
   const bottle = {
@@ -73,6 +80,33 @@ const destroyBottle = (id) => {
   return bottle;
 };
 
+const isBottleTimedOut = (id) => {
+  // Bottle not found (undefined) or invalid idle time (null)
+  if (bottleIdleTimes[id] == null) {
+    return null;
+  }
+  return bottleIdleTimes[id] > reviewTimeout;
+};
+
+const getBottleStatus = (id) => {
+  let bottle = _.findWhere(availableBottles, { id });
+  if (bottle) {
+    return { status: BottleStatus.Available, bottle };
+  }
+
+  bottle = _.findWhere(inReviewBottles, { id });
+  if (bottle) {
+    return { status: BottleStatus.InReview, bottle };
+  }
+
+  bottle = _.findWhere(archivedBottles, { id });
+  if (bottle) {
+    return { status: BottleStatus.Archived, bottle };
+  }
+
+  return { status: BottleStatus.NotFound, bottle: null };
+};
+
 // Updates the idle time for each bottle and discards those that have timed out
 const update = (deltaTime) => {
   // Collect IDs of bottles that need to be discarded due to timeout
@@ -84,7 +118,7 @@ const update = (deltaTime) => {
     bottleIdleTimes[id] = (bottleIdleTimes[id] || 0) + deltaTime;
 
     // If the bottle has been idle for too long, add it to the discard list
-    if (bottleIdleTimes[id] > reviewTimeout) {
+    if (isBottleTimedOut(id) === true) {
       bottlesToDiscard.push(bottle);
     }
   });
@@ -96,10 +130,12 @@ const update = (deltaTime) => {
 };
 
 module.exports = {
+  BottleStatus,
   addBottle,
   fetchBottleById,
   fetchRandomBottle,
   discardBottle,
   destroyBottle,
+  getBottleStatus,
   update,
 };

@@ -299,12 +299,34 @@ const init = () => {
   // Setup popup overlay
   popup.setCurrentOverlay(document.getElementById('popupOverlay'));
 
-  // Start the main loop
-  window.requestAnimationFrame(mainLoop);
-
+  // Cleanup on user leaving
   window.addEventListener('unload', () => {
     discardCurrentBottle();
   });
+
+  setInterval(() => {
+    if (!currentBottle) {
+      return;
+    }
+    // TODO: Use long polling
+    console.log('Checking bottle with short polling...');
+    sendRequest(`/checkBottle?id=${currentBottle.id}`, 'GET', null, {
+      onJSONParsed: (response, method, obj) => {
+        if (response.status === 200 && obj.status !== 'inReview') {
+          popup.sendError(
+            'Bottle discarded: exceeded review timeout period.',
+            settings.errorPopupDuration,
+          );
+          // We don't send a discard request here - server already cleaned up the bottle.
+          driftBottleOut();
+          currentBottle = null;
+        }
+      },
+    });
+  }, 1000);
+
+  // Start the main loop
+  window.requestAnimationFrame(mainLoop);
 };
 
 window.onload = init;

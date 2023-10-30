@@ -6,6 +6,7 @@ const urlStruct = {
   json: {
     GET: {
       '/fetchBottle': jsonHandler.fetchBottle, // Fetching a bottle, either random or by ID
+      '/checkBottle': jsonHandler.checkBottle, // Check if the current bottle is timed out
     },
     HEAD: {
       '/fetchBottle': jsonHandler.fetchBottleMeta, // HEAD request for fetching a bottle

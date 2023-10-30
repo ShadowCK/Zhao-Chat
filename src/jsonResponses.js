@@ -164,6 +164,31 @@ const addBottle = async (request, response) => {
   }
 };
 
+// TODO: Use long polling
+const checkBottle = (request, response, params) => {
+  const { id } = params;
+  if (!id) {
+    const responseJSON = {
+      message: 'Missing bottle ID.',
+      id: 'missingParams',
+    };
+    respondJSON(request, response, 400, responseJSON);
+    return;
+  }
+
+  const result = data.getBottleStatus(id);
+  if (result.status === data.BottleStatus.NotFound) {
+    const responseJSON = {
+      message: 'Bottle not found.',
+      id: 'notFound',
+    };
+    respondJSON(request, response, 404, responseJSON);
+    return;
+  }
+
+  respondJSON(request, response, 200, { ...result });
+};
+
 // 404 Not Found response
 const getNotFound = (request, response) => {
   const responseJSON = {
@@ -180,5 +205,6 @@ module.exports = {
   discardBottle,
   destroyBottle,
   addBottle,
+  checkBottle,
   getNotFound,
 };
