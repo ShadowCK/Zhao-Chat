@@ -87,6 +87,13 @@ const getWebManifest = (request, response) => {
   serveFile(response, webManifest, 'application/manifest+json');
 };
 
+// Images
+const bottleImage = fs.readFileSync(`${__dirname}/../hosted/media/bottle.png`);
+
+const getBottleImage = (request, response) => {
+  serveFile(response, bottleImage, 'image/png');
+};
+
 module.exports = {
   getIndex,
   getCSS,
@@ -103,4 +110,5 @@ module.exports = {
   getMstile150,
   getSafariPinnedTab,
   getWebManifest,
+  getBottleImage,
 };

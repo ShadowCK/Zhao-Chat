@@ -34,6 +34,7 @@ const urlStruct = {
       '/mstile-150x150.png': htmlHandler.getMstile150,
       '/safari-pinned-tab.svg': htmlHandler.getSafariPinnedTab,
       '/site.webmanifest': htmlHandler.getWebManifest,
+      '/bottle.png': htmlHandler.getBottleImage,
       '/fetchBottle': jsonHandler.fetchBottle, // For browser access to the endpoint
     },
   },
