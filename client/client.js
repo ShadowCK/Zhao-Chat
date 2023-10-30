@@ -321,7 +321,12 @@ const init = () => {
   popup.setCurrentOverlay(document.getElementById('popupOverlay'));
 
   // Cleanup on user leaving
-  window.addEventListener('unload', () => {
+  // To ensure the request is sent, we should use "beforeunload" instead of "unload"
+  window.addEventListener('beforeunload', (event) => {
+    // Don't proceed if unloading is cancelled
+    if (event.defaultPrevented) {
+      return;
+    }
     discardCurrentBottle();
   });
 
