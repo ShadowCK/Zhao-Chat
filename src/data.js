@@ -4,6 +4,9 @@ const _ = require('underscore');
 let availableBottles = [];
 let inReviewBottles = [];
 const archivedBottles = [];
+// Track the idle times of bottles in review.
+const bottleIdleTimes = {};
+const reviewTimeout = 10; // seconds
 
 // Add a new bottle with a unique ID, message, date, and view count to availableBottles
 const addBottle = (message) => {
@@ -48,11 +51,14 @@ const fetchRandomBottle = (modifyData = true) => {
 };
 
 // Move a specific bottle from viewedBottles to availableBottles
-const discardBottle = (id) => {
-  const bottle = _.findWhere(inReviewBottles, { id });
+const discardBottle = (bottleOrId) => {
+  const bottle = typeof bottleOrId === 'object' ? bottleOrId : _.findWhere(inReviewBottles, { id: bottleOrId });
+
   if (bottle) {
     availableBottles.push(bottle);
     inReviewBottles = _.without(inReviewBottles, bottle);
+    // Clear the tracked idle time
+    delete bottleIdleTimes[bottle.id];
   }
   return bottle;
 };
@@ -67,10 +73,33 @@ const destroyBottle = (id) => {
   return bottle;
 };
 
+// Updates the idle time for each bottle and discards those that have timed out
+const update = (deltaTime) => {
+  // Collect IDs of bottles that need to be discarded due to timeout
+  const bottlesToDiscard = [];
+
+  // Update the idle time for each bottle in review
+  inReviewBottles.forEach((bottle) => {
+    const { id } = bottle;
+    bottleIdleTimes[id] = (bottleIdleTimes[id] || 0) + deltaTime;
+
+    // If the bottle has been idle for too long, add it to the discard list
+    if (bottleIdleTimes[id] > reviewTimeout) {
+      bottlesToDiscard.push(bottle);
+    }
+  });
+
+  // Process and discard the timed-out bottles
+  bottlesToDiscard.forEach((bottle) => {
+    discardBottle(bottle);
+  });
+};
+
 module.exports = {
   addBottle,
   fetchBottleById,
   fetchRandomBottle,
   discardBottle,
   destroyBottle,
+  update,
 };
