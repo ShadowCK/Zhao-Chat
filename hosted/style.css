@@ -165,15 +165,17 @@ body {
   position: absolute;
   z-index: 1000;
   box-sizing: content-box;
-  transition: all 0.4s ease-in-out;
+  transition: all 1s ease-in-out;
+  filter: brightness(100%) drop-shadow(0 2px 20px rgba(32, 156, 238, 1))
+    drop-shadow(0 2px 30px rgba(32, 156, 238, 1)) drop-shadow(0 2px 40px rgba(32, 156, 238, 1));
 }
 
 #bottle:hover::after {
-  opacity: 0.83; /* Slightly reduce opacity for a "selected" effect */
-  filter: brightness(120%) drop-shadow(0 0 2px rgba(255, 243, 167, 0.7))
-    drop-shadow(0 0 4px rgba(159, 240, 127, 0.6)) drop-shadow(0 0 6px rgba(108, 160, 220, 0.5))
-    drop-shadow(0 0 9px rgba(24, 103, 194, 0.3)); /* Add a glowing effect with transparency */
-  transition: all 0.2s ease-in-out;
+  opacity: 0.83;
+  filter: brightness(120%) drop-shadow(0 0 2px rgba(255, 255, 160, 0.7))
+    drop-shadow(0 0 4px rgba(64, 180, 238, 0.6)) drop-shadow(0 0 6px rgba(32, 156, 238, 0.5))
+    drop-shadow(0 0 9px rgba(25, 100, 180, 0.3));
+  transition: all 0.5s ease-in-out;
 }
 
 #bottle.bottle-discard {

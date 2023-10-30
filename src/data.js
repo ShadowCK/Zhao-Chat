@@ -6,7 +6,7 @@ let inReviewBottles = [];
 const archivedBottles = [];
 // Track the idle times of bottles in review.
 const bottleIdleTimes = {};
-const reviewTimeout = 10; // seconds
+const reviewTimeout = 120; // seconds
 
 const BottleStatus = Object.freeze({
   Available: 'available',
