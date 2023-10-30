@@ -146,6 +146,15 @@ const init = () => {
     bottleDisplay.style.display = 'none';
   });
 
+  bottle.addEventListener('transitionstart', () => {
+    canFetchBottle = false;
+  });
+
+  bottle.addEventListener('transitionend', () => {
+    canFetchBottle = true;
+    eventEmitter.emit('bottleAnimFinished');
+  });
+
   const discardCurrentBottle = (callback) => {
     if (!currentBottle) {
       return;
@@ -185,7 +194,11 @@ const init = () => {
     discardCurrentBottle();
   });
 
-  destroyBottleBtn.addEventListener('click', () => {
+  const destroyCurrentBottle = (callback) => {
+    if (!currentBottle) {
+      return;
+    }
+
     sendRequest(
       '/destroyBottle',
       'POST',
@@ -209,9 +222,17 @@ const init = () => {
           // The distinct visuals would make better user experience.
           driftBottleOut();
           currentBottle = null;
+
+          if (callback && typeof callback === 'function') {
+            callback();
+          }
         },
       },
     );
+  };
+
+  destroyBottleBtn.addEventListener('click', () => {
+    destroyCurrentBottle();
   });
 
   fetchBottleBtn.addEventListener('click', () => {
@@ -219,17 +240,19 @@ const init = () => {
       return;
     }
 
-    // The user can't ask for new bottles until the current request is handled
     canFetchBottle = false;
 
     if (currentBottle) {
+      // Discard the current bottle before fetching a new one
       discardCurrentBottle(() => {
         // Wait until discard animation is finished
-        setTimeout(() => {
+        eventEmitter.once('bottleAnimFinished', () => {
+          canFetchBottle = false;
           eventEmitter.emit('fetchBottle');
-        }, settings.bottleTransitionDuration * 1000);
+        });
       });
     } else {
+      // Request to fetch a new bottle right away
       eventEmitter.emit('fetchBottle');
     }
   });
@@ -246,6 +269,7 @@ const init = () => {
       onJSONParsed: (response, method, data) => {
         if (response.status === 404) {
           popup.sendError(data.message, settings.errorPopupDuration);
+          canFetchBottle = true;
           return; // Exit if no bottle is found
         }
         // 200 Success
@@ -257,9 +281,6 @@ const init = () => {
         currentBottle = data;
         document.getElementById('bottleContent').innerHTML = utils.formatBottleContent(currentBottle);
         driftBottleToCenter();
-      },
-      postProcess: () => {
-        canFetchBottle = true;
       },
     });
   });
